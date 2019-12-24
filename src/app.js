@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -14,19 +14,26 @@ import {
 } from 'react-native';
 
 import Mock from 'mockjs';
+import { MasonryList } from './components/list';
 import icEmpty from './image/ic_404_01.png';
 
 const { width, height } = Dimensions.get('window');
 const Random = Mock.Random;
 
+const COLORS = ['rgba(0,0,0,0.05)', '#ccc', '#bcbcbc'];
+const DATA = Array.from({ length: 100 }).map((_, i) => ({
+  id: `item_${i}`,
+  height: Math.round(Math.random() * 200 + 80),
+  // color: COLORS[i % COLORS.length],
+  color: Random.color(),
+}));
+
 const EmptyComponent = ({ title }) => (
   <View style={styles.emptyContainer}>
-
     <Image
       style={styles.emptyIcon}
       source={icEmpty}
     />
-
     <Text style={styles.emptyTips}>
       {'页面飞出太阳系了o(╥﹏╥)o'}
     </Text>
@@ -41,12 +48,32 @@ const EmptyComponent = ({ title }) => (
   </View>
 );
 
+class Cell extends PureComponent {
+  componentDidMount() {
+    console.warn('mount cell');
+  }
+
+  componentWillUnmount() {
+    console.warn('unmount cell');
+  }
+
+  render() {
+    const { item } = this.props;
+    return (
+      <View style={[styles.cell, { height: item.height, backgroundColor: item.color }]}>
+        <Text>{item.id}</Text>
+      </View>
+    );
+  }
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       mock: [],
       isRefresh: false,
+      DATA: [],
     };
   }
 
@@ -62,9 +89,10 @@ class App extends Component {
       };
       mock.push(props);
     }
-    // this.setState({
-    //   mock,
-    // });
+    this.setState({
+      mock,
+      // DATA,
+    });
   }
 
   loadData(refreshing) {
@@ -80,6 +108,20 @@ class App extends Component {
     }
   }
 
+  _onRefresh = () => {
+    const { isRefresh } = this.state;
+    const params = {
+      page: 0,
+      pageSize: 20,
+    };
+
+    if (!isRefresh) {
+      this.setState({
+        isRefresh: true,
+      }, () => this.onRefreshData(params));
+    }
+  };
+
   async onRefreshData(params) {
     console.log('====== onRefreshData params >>>>', params);
     let timer = setTimeout(() => {
@@ -88,6 +130,14 @@ class App extends Component {
         isRefresh: false,
       });
     }, 1500);
+  }
+
+  renderEmptyComponent() {
+    return (
+      <View style={{ width, height: 60, backgroundColor: '#ccc' }}>
+
+      </View>
+    );
   }
 
   renderListHeader() {
@@ -125,31 +175,52 @@ class App extends Component {
   }
 
   render() {
-    const { mock, isRefresh } = this.state;
-    let _isEmpty = !(mock && mock.length);
+    const { mock, isRefresh, DATA } = this.state;
+    let _isEmpty = !(mock && mock.length) || !(DATA && DATA.length);
+    console.log('===== _isEmpty >>>>>', _isEmpty);
 
     return (
       <SafeAreaView style={styles.container}>
-        <FlatList
-          ref={ref => this._flatList = ref}
-          data={mock}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefresh}
-              onRefresh={() => {
-                this.loadData(true);
-              }}
-            />
-          }
+        {/*<FlatList*/}
+        {/*  ref={ref => this._flatList = ref}*/}
+        {/*  data={mock}*/}
+        {/*  // refreshControl={*/}
+        {/*  //   <RefreshControl*/}
+        {/*  //     refreshing={isRefresh}*/}
+        {/*  //     onRefresh={() => {*/}
+        {/*  //       this.loadData(true);*/}
+        {/*  //     }}*/}
+        {/*  //   />*/}
+        {/*  // }*/}
+        {/*  refreshing={isRefresh}*/}
+        {/*  onRefresh={this._onRefresh}*/}
+        {/*  contentContainerStyle={{ flexGrow: 1 }}*/}
+        {/*  ListEmptyComponent={*/}
+        {/*    <EmptyComponent title="点击重试"/>*/}
+        {/*  }*/}
+        {/*  ListFooterComponent={_isEmpty ? null : this.renderListFooter()}*/}
+        {/*  ListHeaderComponent={_isEmpty ? null : this.renderListHeader()}*/}
+        {/*  onEndReachedThreshold={0.1}*/}
+        {/*  keyExtractor={(item, index) => index.toString()}*/}
+        {/*  renderItem={({ item, index }) => this.renderItemView(item, index)}/>*/}
+
+        <MasonryList
+          onRefresh={_isEmpty ? null : this._onRefresh}
+          refreshing={_isEmpty ? false : isRefresh}
+          data={[]}
+          // data={DATA}
           contentContainerStyle={{ flexGrow: 1 }}
-          ListEmptyComponent={
-            <EmptyComponent title="点击重试"/>
-          }
-          ListFooterComponent={_isEmpty ? null : this.renderListFooter()}
-          ListHeaderComponent={_isEmpty ? null : this.renderListHeader()}
-          onEndReachedThreshold={0.1}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item, index }) => this.renderItemView(item, index)}/>
+          ListHeaderComponent={() => _isEmpty ? null : this.renderListHeader()}
+          ListEmptyComponent={() => {
+            return (
+              <EmptyComponent title={'点击重试'}/>
+            );
+          }}
+          renderItem={({ item }) => <Cell item={item}/>}
+          getHeightForItem={({ item }) => item.height + 2}
+          numColumns={2}
+          keyExtractor={item => item.id}
+        />
       </SafeAreaView>
     );
   }
@@ -205,6 +276,11 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#d1d1d1',
     marginBottom: 25,
+  },
+  cell: {
+    margin: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
 
