@@ -9,12 +9,12 @@ import {
   StatusBar,
   TouchableOpacity,
   Dimensions,
-  FlatList,
+  // FlatList,
   RefreshControl,
 } from 'react-native';
 
 import Mock from 'mockjs';
-import { MasonryList } from './components/list';
+import { MasonryList, FlatList } from './components/list';
 import icEmpty from './image/ic_404_01.png';
 
 const { width, height } = Dimensions.get('window');
@@ -90,8 +90,8 @@ class App extends Component {
       mock.push(props);
     }
     this.setState({
-      mock,
-      // DATA,
+      // mock,
+      DATA,
     });
   }
 
@@ -181,46 +181,37 @@ class App extends Component {
 
     return (
       <SafeAreaView style={styles.container}>
-        {/*<FlatList*/}
-        {/*  ref={ref => this._flatList = ref}*/}
-        {/*  data={mock}*/}
-        {/*  // refreshControl={*/}
-        {/*  //   <RefreshControl*/}
-        {/*  //     refreshing={isRefresh}*/}
-        {/*  //     onRefresh={() => {*/}
-        {/*  //       this.loadData(true);*/}
-        {/*  //     }}*/}
-        {/*  //   />*/}
-        {/*  // }*/}
-        {/*  refreshing={isRefresh}*/}
-        {/*  onRefresh={this._onRefresh}*/}
-        {/*  contentContainerStyle={{ flexGrow: 1 }}*/}
-        {/*  ListEmptyComponent={*/}
-        {/*    <EmptyComponent title="点击重试"/>*/}
-        {/*  }*/}
-        {/*  ListFooterComponent={_isEmpty ? null : this.renderListFooter()}*/}
-        {/*  ListHeaderComponent={_isEmpty ? null : this.renderListHeader()}*/}
-        {/*  onEndReachedThreshold={0.1}*/}
-        {/*  keyExtractor={(item, index) => index.toString()}*/}
-        {/*  renderItem={({ item, index }) => this.renderItemView(item, index)}/>*/}
-
-        <MasonryList
-          onRefresh={_isEmpty ? null : this._onRefresh}
+        <FlatList
+          numColumns={1}
+          ref={ref => this._flatList = ref}
+          data={mock}
           refreshing={_isEmpty ? false : isRefresh}
-          data={[]}
-          // data={DATA}
+          onRefresh={_isEmpty ? null : this._onRefresh}
+          // style={{ flex: 1 }}
           contentContainerStyle={{ flexGrow: 1 }}
-          ListHeaderComponent={() => _isEmpty ? null : this.renderListHeader()}
-          ListEmptyComponent={() => {
-            return (
-              <EmptyComponent title={'点击重试'}/>
-            );
-          }}
-          renderItem={({ item }) => <Cell item={item}/>}
-          getHeightForItem={({ item }) => item.height + 2}
-          numColumns={2}
-          keyExtractor={item => item.id}
-        />
+          ListRenderHeader={_isEmpty ? null : this.renderListHeader}
+          ListRenderFooter={_isEmpty ? null : this.renderListFooter}
+          onEndReachedThreshold={0.1}
+          keyExtractor={(item, index) => index.toString()}
+          renderItem={({ item, index }) => this.renderItemView(item, index)}/>
+
+        {/*<MasonryList*/}
+        {/*  onRefresh={_isEmpty ? null : this._onRefresh}*/}
+        {/*  refreshing={_isEmpty ? false : isRefresh}*/}
+        {/*  // data={[]}*/}
+        {/*  data={DATA}*/}
+        {/*  contentContainerStyle={{ flexGrow: 1 }}*/}
+        {/*  ListHeaderComponent={() => _isEmpty ? null : this.renderListHeader()}*/}
+        {/*  ListEmptyComponent={() => {*/}
+        {/*    return (*/}
+        {/*      <EmptyComponent title={'点击重试'}/>*/}
+        {/*    );*/}
+        {/*  }}*/}
+        {/*  renderItem={({ item }) => <Cell item={item}/>}*/}
+        {/*  getHeightForItem={({ item }) => item.height + 2}*/}
+        {/*  numColumns={2}*/}
+        {/*  keyExtractor={item => item.id}*/}
+        {/*/>*/}
       </SafeAreaView>
     );
   }

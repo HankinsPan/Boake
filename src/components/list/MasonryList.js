@@ -117,6 +117,7 @@ class MasonryList extends React.Component<Props, State> {
   _endsReached = 0;
 
   componentWillReceiveProps(newProps: Props) {
+    // console.log('======= newProps >>>>>', newProps);
     this.setState(_stateFromProps(newProps));
   }
 
@@ -278,7 +279,6 @@ class MasonryList extends React.Component<Props, State> {
 
     return scrollComponent;
   }
-
 }
 
 const styles = StyleSheet.create({
