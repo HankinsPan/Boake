@@ -5,7 +5,7 @@ import qs from 'qs';
 import _ from 'lodash';
 import moment from 'moment';
 
-const domain = 'http://d.api.budejie.com/topic/';
+export const domain = 'http://d.api.budejie.com/topic/';
 
 const contentType = {
   json: 'application/json;charset=utf-8',
@@ -33,7 +33,7 @@ function promiseCancelable(promise) {
 function timeoutPromise(promise, ms) {
   return new Promise((resolve, reject) => {
     const timeoutId = setTimeout(() => {
-      reject(new Error('TIME OUT'));
+      reject(new Error('服务请求超时,请稍后再试'));
     }, ms);
 
     promise.then((res) => {
@@ -46,11 +46,10 @@ function timeoutPromise(promise, ms) {
   });
 }
 
-function filterStatus(requestMethod, res, url, data) {
+function filterStatus(requestMethod, res) {
   if (res.status >= 200 && res.status <= 500) {
-    let response = JSON.parse(res._bodyText);
     if (res.status === 401) {
-
+      console.warn('request 401 warning')
     }
     return res;
   } else {
@@ -74,7 +73,7 @@ async function get(params = { url: { prefix: domain }, cancelable: false, dataTy
 
   let url = prefix ? `${prefix}${path}` : `${path}`;
   if (data) {
-    url = `${url}?${qs.stringify(data, { indices: false })}`;
+    url = `${url}-4.5.9/${data.np || 0}-20.json`;
   }
 
   let headers = {
@@ -86,9 +85,8 @@ async function get(params = { url: { prefix: domain }, cancelable: false, dataTy
   };
 
   let promise = fetch(url, headers);
-
   return promise
-    .then(res => filterStatus('GET', res, url, data))
+    .then(res => filterStatus('GET', res))
     .then(filterJSON)
     .catch(e => {
       const msg = e.message ? e.message : '服务器出错,请稍后再试';

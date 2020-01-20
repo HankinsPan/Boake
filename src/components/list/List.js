@@ -12,7 +12,7 @@ import {
 import PropTypes from 'prop-types';
 import icEmpty from '../../image/ic_404_01.png';
 
-const EmptyComponent = ({ content }) => (
+const EmptyComponent = ({ content, onReload }) => (
   <View style={styles.emptyContainer}>
     <Image
       style={styles.emptyIcon}
@@ -25,9 +25,7 @@ const EmptyComponent = ({ content }) => (
     <TouchableOpacity
       activeOpacity={0.8}
       style={styles.emptyBtnView}
-      onPress={() => {
-        console.log('=== EmptyComponent');
-      }}>
+      onPress={onReload}>
       <Text style={styles.emptyText}>{'点击重试'}</Text>
     </TouchableOpacity>
   </View>
@@ -94,6 +92,11 @@ class List extends Component<Props, State> {
       });
     }
   }
+
+  _onReload = () => {
+    const { onReload } = this.props;
+    onReload && onReload();
+  };
 
   _renderDefaultHeader() {
     const { ListRenderHeader } = this.props;
@@ -195,14 +198,16 @@ class List extends Component<Props, State> {
           }}
           data={data}
           contentContainerStyle={{ flexGrow: 1 }}
-
           showsVerticalScrollIndicator={false}
           renderItem={({ item, i }) => renderItem({ item, i })}
           onEndReached={onEndReached}
           ListFooterComponent={() => this._renderDefaultFooter()}
           ListHeaderComponent={() => this._renderDefaultHeader()}
           ListEmptyComponent={() => {
-            return <EmptyComponent content={''}/>;
+            return <EmptyComponent
+              content={''}
+              onReload={this._onReload}
+            />;
           }}
           keyExtractor={keyExtractor}
         />

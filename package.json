@@ -17,10 +17,16 @@
     "prop-types": "^15.7.2",
     "qs": "^6.9.1",
     "react": "16.9.0",
-    "react-native": "0.61.5"
+    "react-native": "0.61.5",
+    "react-native-gesture-handler": "^1.5.3",
+    "react-native-reanimated": "^1.7.0",
+    "react-native-root-siblings": "^4.0.6",
+    "react-native-screens": "^2.0.0-alpha.25",
+    "react-navigation": "^4.0.10"
   },
   "devDependencies": {
     "@babel/core": "^7.7.7",
+    "@babel/plugin-proposal-decorators": "^7.8.3",
     "@babel/runtime": "^7.7.7",
     "@react-native-community/eslint-config": "^0.0.5",
     "babel-jest": "^24.9.0",
@@ -28,6 +34,16 @@
     "jest": "^24.9.0",
     "metro-react-native-babel-preset": "^0.57.0",
     "react-test-renderer": "16.9.0"
+  },
+  "babel": {
+    "plugins": [
+      [
+        "@babel/plugin-proposal-decorators",
+        {
+          "legacy": true
+        }
+      ]
+    ]
   },
   "jest": {
     "preset": "react-native"
